@@ -16,7 +16,7 @@ Une application Windows qui convertit les fichiers .doc en .docx en utilisant `w
 1. Clonez le repository:
     ```sh
     [git clone https://github.com/Florian-DAUVERGNE/docToDocx.git]
-    cd doc-to-docx-converter
+    cd docToDocx
     ```
 2. Installez les dépendances:
     ```sh
