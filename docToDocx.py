@@ -33,6 +33,11 @@ class FileConverterApp:
         self.backup_checkbox = Checkbutton(self.root, text="Create backup of original files", variable=self.backup_var)
         self.backup_checkbox.pack(pady=10)
 
+        self.delete_after_conversion_var = IntVar(value=1)  # Variable to track deletion option
+        self.delete_after_conversion_checkbox = Checkbutton(self.root, text="Delete original DOC files after conversion", variable=self.delete_after_conversion_var)
+        self.delete_after_conversion_checkbox.pack(pady=10)
+        
+
         self.convert_button = Button(self.root, text="Select Folder and Convert", command=self.convert_folder)
         self.convert_button.pack(pady=10)
 
@@ -43,6 +48,8 @@ class FileConverterApp:
 
         self.conversion_in_progress = False
         self.stop_conversion_flag = False
+
+
 
     def create_backup(self, doc_files, backup_folder, source_folder):
         try:
@@ -73,6 +80,11 @@ class FileConverterApp:
                     doc.Close()
                     self.update_textbox(f"Converted: {os.path.basename(doc_file)}")
 
+                    # Delete original DOC file if option selected
+                    if self.delete_after_conversion_var.get() and os.path.exists(doc_file):
+                        os.remove(doc_file)
+                        self.update_textbox(f"Deleted original: {os.path.basename(doc_file)}")
+
                 if self.stop_conversion_flag:
                     self.update_textbox("Conversion stopped by user.")
                     return False
@@ -84,6 +96,10 @@ class FileConverterApp:
 
     def convert_folder_recursively(self, folder_path):
         doc_files = []
+        self.backup_checkbox.pack_forget()
+        self.close_button.pack_forget()
+        self.convert_button.pack_forget()
+        self.delete_after_conversion_checkbox.pack_forget()
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
                 if filename.endswith('.doc'):
@@ -102,7 +118,7 @@ class FileConverterApp:
 
         self.conversion_in_progress = True
         self.stop_button.pack(pady=10)
-
+        
         word = win32.Dispatch('Word.Application')
         while processed_files < total_files:
             if self.stop_conversion_flag:
@@ -125,6 +141,10 @@ class FileConverterApp:
         self.stop_button.pack_forget()
         self.progress.pack_forget()
         self.estimated_time_label.pack_forget()
+        self.backup_checkbox.pack(pady=10)
+        self.delete_after_conversion_checkbox.pack(pady=10)
+        self.convert_button.pack(pady=10)
+        self.close_button.pack(pady=10)
 
     def stop_conversion(self):
         if self.conversion_in_progress:
